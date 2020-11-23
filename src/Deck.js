@@ -1,21 +1,25 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "./Card";
 import "./Deck.css";
 import axios from "axios";
 const API_BASE_URL = "https://www.deckofcardsapi.com/api/deck";
 
-class Deck extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { deck: null, drawn: [] };
-    this.getCard = this.getCard.bind(this);
-  }
-  async componentDidMount() {
-    let deck = await axios.get(`${API_BASE_URL}/new/shuffle/`);
-    this.setState({ deck: deck.data });
-  }
-  async getCard() {
-    let deck_id = this.state.deck.deck_id;
+function Deck(props){
+ 
+  //  const [state, setState] = useState({ deck: null, drawn: [] })
+   const [deck, setDeck] = useState(null);
+    const [drawn, setdDrawn] = useState([]);
+ 
+  useEffect(()=>{
+    async function getData(){
+      let res = await axios.get(`${API_BASE_URL}/new/shuffle/`);
+      setDeck(res.data);
+    }
+    getData();
+  },[])
+
+  async function getCard() {
+    let deck_id = deck.deck_id;
     try {
       let cardUrl = `${API_BASE_URL}/${deck_id}/draw/`;
       let cardRes = await axios.get(cardUrl);
@@ -24,23 +28,19 @@ class Deck extends Component {
       }
       let card = cardRes.data.cards[0];
       console.log(cardRes.data);
-      this.setState(st => ({
-        drawn: [
-          ...st.drawn,
-          {
-            id: card.code,
-            image: card.image,
-            name: `${card.value} of ${card.suit}`
-          }
-        ]
-      }));
-    } catch (err) {
-      alert(err);
+      setdDrawn(st=>[...st,
+        {
+        id: card.code,
+        image: card.image,
+        name: `${card.value} of ${card.suit}`
+      }])
+    }catch (err) {
+      alert(err)
     }
   }
 
-  render() {
-    const cards = this.state.drawn.map(c => (
+ 
+    const cards = drawn.map(c => (
       <Card key={c.id} name={c.name} image={c.image} />
     ));
     return (
@@ -49,12 +49,12 @@ class Deck extends Component {
         <h2 className='Deck-title subtitle'>
           ♦ A little demo made with React ♦
         </h2>
-        <button className='Deck-btn' onClick={this.getCard}>
+        <button className='Deck-btn' onClick={getCard}>
           Get Card!
         </button>
         <div className='Deck-cardarea'>{cards}</div>
       </div>
     );
-  }
+  
 }
 export default Deck;

@@ -1,16 +1,16 @@
-import React, { Component } from "react";
+import React from "react";
 import Deck from "./Deck";
-import logo from "./logo.svg";
+
 import "./App.css";
 
-class App extends Component {
-  render() {
+function App () {
+
     return (
       <div className='App'>
         <Deck />
       </div>
     );
-  }
+  
 }
 
 export default App;
